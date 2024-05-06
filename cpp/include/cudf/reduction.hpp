@@ -82,6 +82,7 @@ std::unique_ptr<scalar> reduce(
   column_view const& col,
   reduce_aggregation const& agg,
   data_type output_dtype,
+  rmm::cuda_stream_view stream = cudf::get_default_stream(),
   rmm::device_async_resource_ref mr = rmm::mr::get_current_device_resource());
 
 /**
@@ -104,6 +105,7 @@ std::unique_ptr<scalar> reduce(
   reduce_aggregation const& agg,
   data_type output_dtype,
   std::optional<std::reference_wrapper<scalar const>> init,
+  rmm::cuda_stream_view stream = cudf::get_default_stream(),
   rmm::device_async_resource_ref mr = rmm::mr::get_current_device_resource());
 
 /**
@@ -154,6 +156,7 @@ std::unique_ptr<column> segmented_reduce(
   segmented_reduce_aggregation const& agg,
   data_type output_dtype,
   null_policy null_handling,
+  rmm::cuda_stream_view stream = cudf::get_default_stream(),
   rmm::device_async_resource_ref mr = rmm::mr::get_current_device_resource());
 
 /**
@@ -179,6 +182,7 @@ std::unique_ptr<column> segmented_reduce(
   data_type output_dtype,
   null_policy null_handling,
   std::optional<std::reference_wrapper<scalar const>> init,
+  rmm::cuda_stream_view stream = cudf::get_default_stream(),
   rmm::device_async_resource_ref mr = rmm::mr::get_current_device_resource());
 
 /**
@@ -203,6 +207,7 @@ std::unique_ptr<column> scan(
   scan_aggregation const& agg,
   scan_type inclusive,
   null_policy null_handling         = null_policy::EXCLUDE,
+  rmm::cuda_stream_view stream = cudf::get_default_stream(),
   rmm::device_async_resource_ref mr = rmm::mr::get_current_device_resource());
 
 /**
@@ -216,6 +221,7 @@ std::unique_ptr<column> scan(
  */
 std::pair<std::unique_ptr<scalar>, std::unique_ptr<scalar>> minmax(
   column_view const& col,
+  rmm::cuda_stream_view stream = cudf::get_default_stream(),
   rmm::device_async_resource_ref mr = rmm::mr::get_current_device_resource());
 
 /** @} */  // end of group

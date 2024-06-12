@@ -86,7 +86,7 @@ rmm::device_uvector<size_type> reduce_by_row(
   null_equality nulls_equal,
   nan_equality nans_equal,
   rmm::cuda_stream_view stream,
-  rmm::mr::device_memory_resource* mr)
+  rmm::device_async_resource_ref mr)
 {
   CUDF_EXPECTS(keep != duplicate_keep_option::KEEP_ANY,
                "This function should not be called with KEEP_ANY");

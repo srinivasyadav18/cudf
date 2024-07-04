@@ -30,6 +30,7 @@ void bench_groupby_max_multistream(nvbench::state& state, nvbench::type_list<Typ
   auto const num_rows         = static_cast<cudf::size_type>(state.get_int64("num_rows"));
   auto const null_probability = state.get_float64("null_probability");
   auto const num_streams      = state.get_int64("num_streams");
+  auto const num_aggs = state.get_int64("num_aggs");
 
   auto const keys = [&] {
     data_profile const profile =
@@ -59,9 +60,12 @@ void bench_groupby_max_multistream(nvbench::state& state, nvbench::type_list<Typ
 
   std::vector<std::vector<cudf::groupby::aggregation_request>> requests(num_streams);
   for (int64_t i = 0; i < num_streams; i++) {
-    requests[i].emplace_back(cudf::groupby::aggregation_request());
-    requests[i][0].values = vals->view();
-    requests[i][0].aggregations.push_back(cudf::make_max_aggregation<cudf::groupby_aggregation>());
+    for (int64_t j = 0; j < num_aggs; j++)
+    {
+      requests[i].emplace_back(cudf::groupby::aggregation_request());
+      requests[i][j].values = vals->view();
+      requests[i][j].aggregations.push_back(cudf::make_max_aggregation<cudf::groupby_aggregation>());
+    }
   }
 
   auto const mem_stats_logger = cudf::memory_stats_logger();
@@ -77,7 +81,7 @@ void bench_groupby_max_multistream(nvbench::state& state, nvbench::type_list<Typ
     });
 
   auto const elapsed_time = state.get_summary("nv/cold/time/gpu/mean").get_float64("value");
-  state.add_element_count(static_cast<double>(num_rows) / elapsed_time / 1'000'000., "Mrows/s");
+  state.add_element_count(static_cast<double>(num_rows * num_streams * num_aggs) / elapsed_time / 1'000'000., "Mrows/s");
   state.add_buffer_size(
     mem_stats_logger.peak_memory_usage(), "peak_memory_usage", "peak_memory_usage");
 }
@@ -88,4 +92,5 @@ NVBENCH_BENCH_TYPES(bench_groupby_max_multistream,
   .add_int64_axis("cardinality", {0})
   .add_int64_power_of_two_axis("num_rows", {12, 18})
   .add_float64_axis("null_probability", {0, 0.1, 0.9})
+  .add_int64_axis("num_aggs", {1, 2, 4, 8, 16, 32})
   .add_int64_axis("num_streams", {1, 2, 4, 8});
